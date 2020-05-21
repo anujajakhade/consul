@@ -49,11 +49,8 @@ export const routes = {
         addresses: {
           _options: { path: '/addresses' },
         },
-        tags: {
-          _options: { path: '/tags' },
-        },
-        metadata: {
-          _options: { path: '/metadata' },
+        meta: {
+          _options: { path: '/meta' },
         },
       },
       notfound: {
