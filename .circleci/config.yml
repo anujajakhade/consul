@@ -203,7 +203,7 @@ jobs:
       # save dev build to CircleCI
       - store_artifacts:
           path: ./pkg/bin
-
+   
   # build all 386 architecture supported OS binaries
   build-386:
     <<: *build-distros
@@ -219,7 +219,7 @@ jobs:
       <<: *build-env
       XC_OS: "darwin freebsd linux solaris windows"
       XC_ARCH: "amd64"
-
+  
   # build all arm/arm64 architecture supported OS binaries
   build-arm:
     docker:
@@ -250,7 +250,26 @@ jobs:
           command: go build -o ./pkg/bin/linux_aarch64/consul  -ldflags="${GOLDFLAGS}"
       - store_artifacts:
           path: ./pkg/bin
-
+    
+   # build all s390x architecture supported OS binaries
+   build-s390x: 
+    docker:
+      - image: *GOLANG_IMAGE
+    environment:
+      <<: *ENVIRONMENT
+      CGO_ENABLED: 1
+      GOOS: linux
+    steps:
+      - checkout
+      - run: sudo apt-get update && sudo apt-get install -y g++-s390x-linux-gnu gcc-s390x-linux-gnu crossbuild-essential-s390x
+      - run: 
+          environment:
+            CC: s390x-linux-gnu-gcc
+            GOARCH: s390x
+          command: go build -o ./pkg/bin/linux_s390x/consul  -ldflags="${GOLDFLAGS}"
+      - store_artifacts:
+          path: ./pkg/bin
+          
   # create a development build
   dev-build:
     docker:
@@ -635,6 +654,7 @@ workflows:
             - check-vendor
       - build-amd64: *require-check-vendor
       - build-arm: *require-check-vendor
+      - build-s390x: *require-check-vendor
       # every commit on ui-staging and master will have a rebuilt UI
       - frontend-cache:
           filters:
